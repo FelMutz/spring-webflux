@@ -111,12 +111,6 @@ public class AccountServiceTest {
 
     @Test
     public void updateAccount() {
-        accountMono = Mono.just(Account.builder()
-                .card("456")
-                .accountType(AccountType.SAVING)
-                .balance(1000D)
-                .password("123").build());
-
 
         account.setCard("456");
         account.setAccountType(AccountType.NORMAL);
@@ -124,11 +118,13 @@ public class AccountServiceTest {
         account.setPassword("789");
 
 
-        when(accountRepository.save(account)).thenReturn(accountMono);
+        when(accountRepository.save(account)).thenReturn(Mono.just(account));
 
         accountService.update(account).subscribe(account1 -> account = account1);
 
-        assertEquals(account, account);
+        assertEquals(Double.valueOf(900), account.getBalance());
+        assertEquals("789", account.getPassword());
+        assertEquals(AccountType.NORMAL, account.getAccountType());
     }
 
     @Test
