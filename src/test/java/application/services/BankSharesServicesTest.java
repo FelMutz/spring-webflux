@@ -14,7 +14,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import reactor.core.publisher.Mono;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -131,30 +131,21 @@ public class BankSharesServicesTest {
 
     }
 
-   /* @Test
-    public void transfer() {
-
+    @Test
+    public void transferAccountSubmit() {
         bankSharesDto.setCard("123");
         bankSharesDto.setAmount(100D);
         bankSharesDto.setPassword("123");
         bankSharesDto.setAccountTransfer("456");
 
         Account accountBaseSubmit = Account.builder()
-                .accountType(AccountType.PRIVATE)
+                .accountType(AccountType.SAVING)
                 .balance(1000D)
                 .password("123")
                 .card("123")
                 .build();
 
-        Account accountBaseReceive = Account.builder()
-                .accountType(AccountType.NORMAL)
-                .balance(1000D)
-                .password("123")
-                .card("456")
-                .build();
-
         Mono<Account> accountSubmitMono = Mono.just(accountBaseSubmit);
-        Mono<Account> accountReceiveMono = Mono.just(accountBaseReceive);
 
         when(accountRepository.findById(bankSharesDto.getCard())).thenReturn(accountSubmitMono);
 
@@ -164,7 +155,28 @@ public class BankSharesServicesTest {
 
         when(accountService.update(accountBaseSubmit)).thenReturn(accountSubmitMono);
 
+        bankSharesServices.transferAccountSubmit(bankSharesDto.getCard(), bankSharesDto.getAmount(), bankSharesDto.getPassword())
+                .subscribe(account1 -> account = account1);
 
+        assertEquals(Double.valueOf(894), account.getBalance());
+
+    }
+
+    @Test
+    public void transferAccountReceive() {
+        bankSharesDto.setCard("123");
+        bankSharesDto.setAmount(100D);
+        bankSharesDto.setPassword("123");
+        bankSharesDto.setAccountTransfer("456");
+
+        Account accountBaseReceive = Account.builder()
+                .accountType(AccountType.NORMAL)
+                .balance(1000D)
+                .password("123")
+                .card("456")
+                .build();
+
+        Mono<Account> accountReceiveMono = Mono.just(accountBaseReceive);
 
         when(accountRepository.findById(bankSharesDto.getAccountTransfer())).thenReturn(accountReceiveMono);
 
@@ -175,10 +187,9 @@ public class BankSharesServicesTest {
         when(accountService.update(accountBaseReceive)).thenReturn(accountReceiveMono);
 
 
+        bankSharesServices.transferAccountReceive(bankSharesDto.getAccountTransfer(), bankSharesDto.getAmount()).subscribe(account1 -> account = account1);
 
-        bankSharesServices.transfer(bankSharesDto).subscribe(account1 -> account = account1);
+        assertEquals(Double.valueOf(1100), account.getBalance());
+    }
 
-        assertEquals(Double.valueOf(900), account.getBalance());
-
-    }*/
 }

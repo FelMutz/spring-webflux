@@ -3,7 +3,6 @@ package application.controllers;
 import application.dto.BindAccountDto;
 import application.dto.PersonDto;
 import application.facade.PersonServiceFacade;
-import application.mappers.PersonMap;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;

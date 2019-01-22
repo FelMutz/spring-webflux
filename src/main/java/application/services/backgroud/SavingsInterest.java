@@ -6,7 +6,6 @@ import application.domain.enums.AccountType;
 import application.services.AccountService;
 import application.services.Roud;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
