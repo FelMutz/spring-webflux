@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 
 
 @Component
-@EnableScheduling
+//@EnableScheduling
 public class SavingsInterest{
     @Autowired
     AccountService accountService;
@@ -23,7 +23,7 @@ public class SavingsInterest{
 
         accountService.findByAccountType(AccountType.SAVING)
                 .map(account -> calcInterestMonthlyOfSavingsAccounts(account))
-                .flatMap(account -> accountService.updateAccount(account))
+                .flatMap(account -> accountService.update(account))
                 .subscribe();
     }
 

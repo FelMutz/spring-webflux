@@ -2,6 +2,7 @@ package application.controllers;
 
 
 import application.dto.AccountDto;
+import application.facade.AccountServiceFacade;
 import application.mappers.AccountMap;
 import application.services.AccountService;
 import lombok.AllArgsConstructor;
@@ -18,38 +19,38 @@ import javax.validation.Valid;
 @AllArgsConstructor
 public class AccountController {
 
-    AccountService accountService;
+    AccountServiceFacade accountServiceFacade;
 
     @GetMapping
     public Flux<AccountDto> findAll(){
 
-        return accountService.findAll().map(AccountMap::mapToDto);
+        return accountServiceFacade.findAll();
     }
 
     @GetMapping("{card}")
     public Mono<AccountDto> findById(@PathVariable String card){
-        return accountService.findById(card).map(AccountMap::mapToDto);
+        return accountServiceFacade.findById(card);
     }
 
     @GetMapping("paging")
     public Flux<AccountDto> findByPage(@RequestParam int page, @RequestParam int size){
         PageRequest pageRequest = PageRequest.of(page, size);
-        return accountService.findAllBy(pageRequest).map(AccountMap::mapToDto);
+        return accountServiceFacade.findAllBy(page,size);
     }
 
     @PostMapping
     public Mono<AccountDto> insert(@Valid @RequestBody AccountDto accountDto){
-        return accountService.insert(AccountMap.dtoToMap(accountDto)).map(AccountMap::mapToDto);
+        return accountServiceFacade.insert(accountDto);
     }
 
     @PutMapping
     public Mono<AccountDto> update(@Valid @RequestBody AccountDto accountDto){
-        return accountService.updateAccount(AccountMap.dtoToMap(accountDto)).map(AccountMap::mapToDto);
+        return accountServiceFacade.update(accountDto);
     }
 
     @DeleteMapping("{card}")
     public Mono<Void> delete(@PathVariable String card){
-        return accountService.delete(card);
+        return accountServiceFacade.delete(card);
     }
 
 

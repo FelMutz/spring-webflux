@@ -39,7 +39,7 @@ public class AccountService {
         return  accountRepository.insert(account);
     }
 
-    public Mono<Account> updateAccount(Account account){
+    public Mono<Account> update(Account account){
         return accountRepository.save(account);
     }
 

@@ -2,6 +2,7 @@ package application.controllers;
 
 import application.dto.AccountDto;
 import application.dto.BankSharesDto;
+import application.facade.BankSharesServicesFacade;
 import application.mappers.AccountMap;
 import application.services.BankSharesServices;
 import lombok.AllArgsConstructor;
@@ -19,23 +20,23 @@ import javax.validation.Valid;
 @AllArgsConstructor
 public class BankSharesControlle {
 
-    BankSharesServices bankSharesServices;
+    BankSharesServicesFacade bankSharesServicesFacade;
 
     @PostMapping("withdrawal")
     @Transactional
     public Mono<AccountDto> withdrawal(@Valid @RequestBody BankSharesDto bankSharesDto){
-        return bankSharesServices.withdrawal(bankSharesDto).map(AccountMap::mapToDto);
+        return bankSharesServicesFacade.withdrawal(bankSharesDto);
     }
 
     @PostMapping("deposit")
     public Mono<AccountDto> deposit(@Valid @RequestBody BankSharesDto bankSharesDto){
-        return bankSharesServices.deposit(bankSharesDto).map(AccountMap::mapToDto);
+        return bankSharesServicesFacade.deposit(bankSharesDto);
     }
 
     @PostMapping("transfer")
     @Transactional
     public Mono<AccountDto> transfer(@Valid @RequestBody BankSharesDto bankSharesDto){
-        return bankSharesServices.transfer(bankSharesDto).map(AccountMap::mapToDto);
+        return bankSharesServicesFacade.transfer(bankSharesDto);
     }
 
 

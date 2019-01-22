@@ -7,7 +7,9 @@ import application.repository.AccountRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Mono;
+import reactor.util.function.Tuple2;
 
 @Service
 @AllArgsConstructor
@@ -27,7 +29,7 @@ public class BankSharesServices {
 
             account.setBalance(newBalance);
 
-            return accountService.updateAccount(account);
+            return accountService.update(account);
         }).doOnError(throwable -> ExceptionCustom.builder().code(100).detail("Erro Interno. Entre em contato com o suporte.").message("Saque não realizado."));
     }
 
@@ -37,39 +39,45 @@ public class BankSharesServices {
             ValidPassword.validPassword(account.getPassword(), bankSharesDto.getPassword());
 
             account.setBalance(Roud.roudBalance( account.getAccountType().deposit( account.getBalance(), bankSharesDto.getAmount() ) ));
-            return accountService.updateAccount(account);
+            return accountService.update(account);
         }).doOnError(throwable -> ExceptionCustom.builder().code(100).detail("Erro Interno. Entre em contato com o suporte.").message("Deposito não realizado."));
 
     }
 
-    public Mono<Account> transfer(BankSharesDto bankSharesDto){
 
-        if (bankSharesDto.getAccountTransfer() == null){
+    public Mono<Tuple2<Account, Account>> transfer(BankSharesDto bankSharesDto){
+
+        if(bankSharesDto.getAccountTransfer() == null){
             throw ExceptionCustom.builder().code(20).httpStatus(HttpStatus.BAD_REQUEST).message("Erro na solicitação").detail("AccountTransfer não pode ser Null").build();
         }
 
-        Mono<Account> accountMono = accountService.findById(bankSharesDto.getCard())
-                .flatMap(account -> {
-                    ValidPassword.validPassword(account.getPassword(), bankSharesDto.getPassword());
+        Mono<Account> accountMonoSubmit = transferAccountSubmit(bankSharesDto.getCard(),bankSharesDto.getAmount(), bankSharesDto.getPassword());
 
-                    Double newBalance = Roud.roudBalance(account.getAccountType().transfer(account.getBalance(), bankSharesDto.getAmount()));
+        Mono<Account> accountMonoReceive = transferAccountReceive(bankSharesDto.getAccountTransfer(),bankSharesDto.getAmount());
+
+        return Mono.zip(accountMonoSubmit, accountMonoReceive);
+    }
+
+    public Mono<Account> transferAccountSubmit(String accountId, Double amount, String password){
+       return  accountService.findById(accountId)
+                .flatMap(account -> {
+                    ValidPassword.validPassword(account.getPassword(), password);
+
+                    Double newBalance = Roud.roudBalance(account.getAccountType().transfer(account.getBalance(), amount));
 
                     account.getAccountType().validBalanceLimit(newBalance);
 
                     account.setBalance(newBalance);
 
-                    return accountService.updateAccount(account);
+                    return accountService.update(account);
                 });
+    }
 
-        Mono<Account> accountMono1 = accountMono
-                .flatMap(account -> accountService.findById(bankSharesDto.getAccountTransfer())).flatMap(accountTransfer -> {
-                    accountTransfer.setBalance(Roud.roudBalance(accountTransfer.getBalance() + bankSharesDto.getAmount()));
-                    return accountService.updateAccount(accountTransfer);
-                })
-                .flatMap(account -> accountService.findById(bankSharesDto.getCard()));
+    public Mono<Account> transferAccountReceive(String accountId, Double amount){
 
-        return Mono.zip(accountMono, accountMono1)
-                .map(objects -> objects.getT1()).doOnError(throwable ->
-                        ExceptionCustom.builder().code(100).detail("Erro Interno. Entre em contato com o suporte.").message("Transferencia não realizado."));
+        return  accountService.findById(accountId).flatMap(accountTransfer -> {
+                    accountTransfer.setBalance(Roud.roudBalance(accountTransfer.getBalance() + amount));
+                    return accountService.update(accountTransfer);
+                });
     }
 }
