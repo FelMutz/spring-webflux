@@ -3,36 +3,52 @@ package application.controllers;
 import application.domain.Account;
 import application.domain.enums.AccountType;
 import application.dto.AccountDto;
+import application.facade.AccountServiceFacade;
 import application.repository.AccountRepository;
-import org.junit.FixMethodOrder;
+import application.services.AccountService;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.MethodSorters;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.SpringBootConfiguration;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Bean;
-import org.springframework.http.HttpStatus;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.ApplicationContext;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 
 import java.util.ArrayList;
 
-import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
+
 @RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@ContextConfiguration(classes = {AccountService.class, AccountServiceFacade.class, AccountController.class})
+@WebFluxTest
 public class AccountControllerTest {
+
+    @Autowired
+    ApplicationContext applicationContext;
 
     @Autowired
     WebTestClient webTestClient;
 
-    @Mock
+    @MockBean
     AccountRepository accountRepository;
+
+
+
+    @Before
+    public void setUp(){
+
+
+        webTestClient =
+                WebTestClient.bindToApplicationContext(applicationContext)
+                .configureClient()
+                .baseUrl("/accounts")
+                .build();
+    }
 
     @Test
     public void findAll() {
@@ -44,7 +60,7 @@ public class AccountControllerTest {
 
         when(accountRepository.findAll()).thenReturn(accountFlux);
 
-        webTestClient.get().uri("/accounts").accept(MediaType.APPLICATION_JSON).exchange().expectStatus().isOk().expectBodyList(AccountDto.class).hasSize(3);
+        webTestClient.get().accept(MediaType.APPLICATION_JSON).exchange().expectStatus().isOk().expectBodyList(AccountDto.class).hasSize(1);
     }
 
     @Test
