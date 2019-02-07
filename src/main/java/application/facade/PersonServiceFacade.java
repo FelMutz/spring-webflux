@@ -2,7 +2,6 @@ package application.facade;
 
 import application.dto.BindAccountDto;
 import application.dto.PersonDto;
-import application.mappers.AccountMap;
 import application.mappers.PersonMap;
 import application.services.PersonService;
 import lombok.AllArgsConstructor;

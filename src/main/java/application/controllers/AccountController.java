@@ -4,7 +4,6 @@ package application.controllers;
 import application.dto.AccountDto;
 import application.facade.AccountServiceFacade;
 import lombok.AllArgsConstructor;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;

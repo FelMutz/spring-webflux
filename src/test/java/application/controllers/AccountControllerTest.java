@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.ApplicationContext;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -22,12 +23,10 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Objects;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
-
-import static org.assertj.core.api.Assertions.*;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = {AccountService.class, AccountServiceFacade.class, AccountController.class})
@@ -86,6 +85,24 @@ public class AccountControllerTest {
 
     @Test
     public void findByPage() {
+        int page = 0;
+        int size = 3;
+        PageRequest pageRequest = PageRequest.of(page, size);
+
+        Flux<Account> accountFlux = Flux.fromIterable( new ArrayList<>(){{
+            add(Account.builder().card("123").password("123").accountType(AccountType.NORMAL).balance(1000D).build());
+            add(Account.builder().card("456").password("456").accountType(AccountType.PRIVATE).balance(1000D).build());
+            add(Account.builder().card("789").password("789").accountType(AccountType.SAVING).balance(1000D).build());
+        }});
+
+        when(accountRepository.findAllBy(pageRequest)).thenReturn(accountFlux);
+
+        webTestClient.get().uri("/paging?page={page}&size={size}", page,size)
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBodyList(AccountDto.class).hasSize(3);
     }
 
     @Test

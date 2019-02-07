@@ -1,6 +1,5 @@
 package application.facade;
 
-import application.domain.Account;
 import application.domain.enums.AccountType;
 import application.dto.AccountDto;
 import application.mappers.AccountMap;
@@ -10,8 +9,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.util.Optional;
 
 import static application.mappers.AccountMap.dtoToMap;
 
