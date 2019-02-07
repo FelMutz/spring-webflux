@@ -147,5 +147,15 @@ public class AccountControllerTest {
 
     @Test
     public void delete() {
+
+        when(accountRepository.deleteById("123")).thenReturn(Mono.empty());
+
+        webTestClient.delete()
+                .uri("/{id}", "123")
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(Void.class);
+
     }
 }
