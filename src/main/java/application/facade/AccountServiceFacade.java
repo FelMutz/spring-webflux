@@ -1,5 +1,6 @@
 package application.facade;
 
+import application.domain.Account;
 import application.domain.enums.AccountType;
 import application.dto.AccountDto;
 import application.mappers.AccountMap;
@@ -9,6 +10,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.util.Optional;
 
 import static application.mappers.AccountMap.dtoToMap;
 
@@ -36,7 +39,11 @@ public class AccountServiceFacade {
     }
 
     public Mono<AccountDto> update(AccountDto accountDto){
-        return accountService.update(dtoToMap(accountDto)).map(AccountMap::mapToDto);
+        return accountService.findById(accountDto.getCard()).flatMap(account ->{
+            if(accountDto.getPassword() != null) account.setPassword(accountDto.getPassword());
+            if(accountDto.getBalance() != null) account.setBalance(accountDto.getBalance());
+            return accountService.update(account).map(AccountMap::mapToDto);
+        });
     }
 
     public Mono<Void> deleteAll() {

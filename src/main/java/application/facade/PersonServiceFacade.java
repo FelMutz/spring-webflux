@@ -2,6 +2,7 @@ package application.facade;
 
 import application.dto.BindAccountDto;
 import application.dto.PersonDto;
+import application.mappers.AccountMap;
 import application.mappers.PersonMap;
 import application.services.PersonService;
 import lombok.AllArgsConstructor;
@@ -26,8 +27,14 @@ public class PersonServiceFacade {
         return personService.findById(id).map(PersonMap::mapToDto);
     }
 
-    public Mono<PersonDto> update(PersonDto person){
-        return personService.update(dtoToMap(person)).map(PersonMap::mapToDto);
+    public Mono<PersonDto> update(PersonDto personDto){
+        return personService.findById(personDto.getIdPerson()).flatMap(person ->{
+            if(personDto.getName() != null) person.setName(personDto.getName());
+            if(personDto.getAge() != null) person.setAge(personDto.getAge());
+            if(personDto.getCNPJ() != null) person.setCNPJ(personDto.getCNPJ());
+            if(personDto.getPersonType() != null) person.setPersonType(personDto.getPersonType());
+            return personService.update(person).map(PersonMap::mapToDto);
+        });
     }
 
     public Mono<PersonDto> insert(PersonDto person) {

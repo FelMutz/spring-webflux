@@ -4,6 +4,7 @@ import application.domain.Account;
 import application.domain.enums.AccountType;
 import application.dto.AccountDto;
 import application.facade.AccountServiceFacade;
+import application.mappers.AccountMap;
 import application.repository.AccountRepository;
 import application.services.AccountService;
 import org.junit.Before;
@@ -18,10 +19,15 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Objects;
 
 import static org.mockito.Mockito.when;
+
+import static org.assertj.core.api.Assertions.*;
 
 @RunWith(SpringRunner.class)
 @ContextConfiguration(classes = {AccountService.class, AccountServiceFacade.class, AccountController.class})
@@ -29,20 +35,19 @@ import static org.mockito.Mockito.when;
 public class AccountControllerTest {
 
     @Autowired
+    private
     ApplicationContext applicationContext;
 
     @Autowired
+    private
     WebTestClient webTestClient;
 
     @MockBean
+    private
     AccountRepository accountRepository;
-
-
 
     @Before
     public void setUp(){
-
-
         webTestClient =
                 WebTestClient.bindToApplicationContext(applicationContext)
                 .configureClient()
@@ -60,11 +65,23 @@ public class AccountControllerTest {
 
         when(accountRepository.findAll()).thenReturn(accountFlux);
 
-        webTestClient.get().accept(MediaType.APPLICATION_JSON).exchange().expectStatus().isOk().expectBodyList(AccountDto.class).hasSize(1);
+        webTestClient.get().accept(MediaType.APPLICATION_JSON).exchange().expectStatus().isOk().expectBodyList(AccountDto.class).hasSize(3);
     }
 
     @Test
     public void findById() {
+        Mono<Account> account = Mono.just(Account.builder().card("123").password("123").accountType(AccountType.NORMAL).balance(1000D).build());
+
+        when(accountRepository.findById("123")).thenReturn(account);
+
+        webTestClient.get().uri("/{id}", "123")
+                .accept(MediaType.APPLICATION_JSON)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(AccountDto.class)
+                .consumeWith(response ->
+                        assertThat(Objects.requireNonNull(response.getResponseBody()).getAccountType()).isEqualTo(AccountType.NORMAL));
     }
 
     @Test
@@ -72,11 +89,43 @@ public class AccountControllerTest {
     }
 
     @Test
-    public void insert() {
+    public void insertNormalAccount() {
+
+        Account account = Account.builder().card("123").password("123456").accountType(AccountType.NORMAL).balance(1000D).build();
+        AccountDto accountDto = AccountMap.mapToDto(account);
+        accountDto.setAccountType(null);
+
+        when(accountRepository.insert(account)).thenReturn(Mono.just(account));
+
+        webTestClient.post()
+                .body(Mono.just(accountDto), AccountDto.class)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(AccountDto.class)
+                .consumeWith(response ->
+                        assertThat(Objects.requireNonNull(response.getResponseBody()).getAccountType()).isEqualTo(AccountType.NORMAL));
     }
 
     @Test
     public void update() {
+
+        Account accountBefore = Account.builder().card("123").password("123456").accountType(AccountType.NORMAL).balance(1000D).build();
+        Account accountAfter = Account.builder().card("123").password("123456").accountType(AccountType.NORMAL).balance(800D).build();
+        Account accountUpdate = Account.builder().card("123").balance(800D).build();
+        AccountDto accountDto = AccountMap.mapToDto(accountUpdate);
+
+        when(accountRepository.findById(accountDto.getCard())).thenReturn(Mono.just(accountBefore));
+        when(accountRepository.save(accountAfter)).thenReturn(Mono.just(accountAfter));
+
+        webTestClient.put()
+                .body(Mono.just(accountDto), AccountDto.class)
+                .exchange()
+                .expectStatus()
+                .isOk()
+                .expectBody(AccountDto.class)
+                .consumeWith(response ->
+                        assertThat(Objects.requireNonNull(response.getResponseBody()).getBalance()).isEqualTo(800D));
     }
 
     @Test

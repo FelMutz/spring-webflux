@@ -28,7 +28,6 @@ public class PersonController {
 
     @GetMapping("paging")
     public Flux<PersonDto> findByPage(@RequestParam int page, @RequestParam int size){
-        PageRequest pageRequest = PageRequest.of(page, size);
         return personServiceFacade.findAllBy(page,size);
 
     }
@@ -44,12 +43,12 @@ public class PersonController {
     }
 
     @PostMapping("bindsAccount")
-    public Mono<PersonDto> bindsAccount(@RequestBody BindAccountDto bindAccountDto){
+    public Mono<PersonDto> bindsAccount(@Valid @RequestBody BindAccountDto bindAccountDto){
         return personServiceFacade.bindsAccount(bindAccountDto);
     }
 
     @PutMapping
-    public Mono<PersonDto> update(@Valid @RequestBody PersonDto personDto){
+    public Mono<PersonDto> update(@RequestBody PersonDto personDto){
         return personServiceFacade.update(personDto);
     }
 

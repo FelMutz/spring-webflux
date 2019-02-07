@@ -32,7 +32,6 @@ public class AccountController {
 
     @GetMapping("paging")
     public Flux<AccountDto> findByPage(@RequestParam int page, @RequestParam int size){
-        PageRequest pageRequest = PageRequest.of(page, size);
         return accountServiceFacade.findAllBy(page,size);
     }
 
@@ -42,7 +41,7 @@ public class AccountController {
     }
 
     @PutMapping
-    public Mono<AccountDto> update(@Valid @RequestBody AccountDto accountDto){
+    public Mono<AccountDto> update(@RequestBody AccountDto accountDto){
         return accountServiceFacade.update(accountDto);
     }
 
