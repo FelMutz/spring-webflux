@@ -4,6 +4,7 @@ import application.domain.Account;
 import application.domain.Person;
 import application.domain.enums.PersonType;
 import application.dto.BindAccountDto;
+import application.exceptions.ExceptionCustom;
 import application.repository.PersonRepository;
 import org.junit.Before;
 import org.junit.Rule;
@@ -77,7 +78,7 @@ public class PersonServiceTest {
 
     }
 
-//    @Test(expected = ExceptionCustom.class)
+//    @Test
 //    public void findByIdPersonNotFound() {
 //
 //        thrown.expect(ExceptionCustom.class);

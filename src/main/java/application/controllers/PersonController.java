@@ -19,6 +19,7 @@ public class PersonController {
 
     PersonServiceFacade personServiceFacade;
 
+
     @GetMapping
     public Flux<PersonDto> findAll(){
         return personServiceFacade.findAll();
@@ -54,6 +55,11 @@ public class PersonController {
     @DeleteMapping("{id}")
     public Mono<Void> delete(@PathVariable String id){
         return personServiceFacade.delete(id);
+    }
+
+    @GetMapping("by")
+    public Flux<PersonDto> findAllByAccount(@RequestParam String account){
+        return personServiceFacade.findAllByAccount(account);
     }
 
 }

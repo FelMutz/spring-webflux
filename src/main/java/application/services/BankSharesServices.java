@@ -14,8 +14,6 @@ import reactor.util.function.Tuple2;
 @AllArgsConstructor
 public class BankSharesServices {
 
-    private AccountRepository accountRepository;
-
     private AccountService accountService;
 
     public Mono<Account> withdrawal(BankSharesDto bankSharesDto){
@@ -42,7 +40,6 @@ public class BankSharesServices {
         }).doOnError(throwable -> ExceptionCustom.builder().code(100).detail("Erro Interno. Entre em contato com o suporte.").message("Deposito não realizado."));
 
     }
-
 
     public Mono<Tuple2<Account, Account>> transfer(BankSharesDto bankSharesDto){
 

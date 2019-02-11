@@ -19,6 +19,7 @@ public class PersonServiceFacade {
     PersonService personService;
 
     public Mono<PersonDto> bindsAccount(BindAccountDto bindAccountDto){
+
         return personService.bindsAccount(bindAccountDto).map(PersonMap::mapToDto);
     }
 
@@ -48,7 +49,6 @@ public class PersonServiceFacade {
         return personService.findAll().map(PersonMap::mapToDto);
     }
 
-
     public Flux<PersonDto> findAllBy(Integer page, Integer size){
         PageRequest pageRequest = PageRequest.of(page, size);
         return personService.findAllBy(pageRequest).map(PersonMap::mapToDto);
@@ -57,4 +57,6 @@ public class PersonServiceFacade {
     public Mono<Void> deleteAll(){
         return personService.deleteAll();
     }
+
+    public Flux<PersonDto> findAllByAccount(String card){return personService.findAllByAccount(card).map(PersonMap::mapToDto);}
 }

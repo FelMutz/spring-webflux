@@ -18,13 +18,11 @@ public class PersonService {
     private PersonRepository personRepository;
 
     public Mono<Person> bindsAccount(BindAccountDto bindAccountDto){
-       return findById(bindAccountDto.getId()).map(person -> {
+       return findById(bindAccountDto.getId()).flatMap(person -> {
            bindAccountDto.getAccounts().forEach(x -> person.getAccounts().add(x));
-           return person;
+           return update(person);
        });
     }
-
-
 
     public Mono<Person> findById(String id){
         return personRepository.findById(id).switchIfEmpty(
@@ -32,7 +30,8 @@ public class PersonService {
                         ExceptionCustom
                                 .builder()
                                 .code(10)
-                                .httpStatus(HttpStatus.NOT_FOUND).message("Dado não existe no banco!").detail("Pessoa não encontrada com o id: "+id).build()));
+                                .httpStatus(HttpStatus.NOT_FOUND).message("Dado não existe no banco!")
+                                .detail("Pessoa não encontrada com o id: "+id).build()));
     }
 
     public Mono<Person> update(Person person){
@@ -58,5 +57,17 @@ public class PersonService {
 
     public Mono<Void> deleteAll(){
         return personRepository.deleteAll();
+    }
+
+    public Flux<Person> findAllByAccount(String account){
+
+        return personRepository.findAllByAccounts(account).switchIfEmpty(
+                Mono.error(
+                        ExceptionCustom
+                                .builder()
+                                .code(10)
+                                .httpStatus(HttpStatus.NOT_FOUND).message("Dado não existe no banco!")
+                                .detail("Não foi encontrada nenhuma Pessoa vinculada com a Conta de id: "+account).build()));
+
     }
 }
