@@ -16,7 +16,7 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping("shares")
 @AllArgsConstructor
-public class BankSharesControlle {
+public class BankSharesController {
 
     BankSharesServicesFacade bankSharesServicesFacade;
 

@@ -3,7 +3,6 @@ package application.services;
 import application.domain.Account;
 import application.domain.enums.AccountType;
 import application.dto.BankSharesDto;
-import application.repository.AccountRepository;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -20,8 +19,6 @@ import static org.mockito.Mockito.when;
 
 public class BankSharesServicesTest {
 
-    @Mock
-    AccountRepository accountRepository;
 
     @Mock
     AccountService accountService;
@@ -59,11 +56,7 @@ public class BankSharesServicesTest {
 
         Mono<Account> accountMono = Mono.just(accountBase);
 
-        when(accountRepository.findById(bankSharesDto.getCard())).thenReturn(accountMono);
-
         when(accountService.findById(bankSharesDto.getCard())).thenReturn(accountMono);
-
-        when(accountRepository.save(any())).thenReturn(accountMono);
 
         when(accountService.update(any())).thenReturn(accountMono);
 
@@ -88,11 +81,7 @@ public class BankSharesServicesTest {
 
         Mono<Account> accountMono = Mono.just(accountBase);
 
-        when(accountRepository.findById(bankSharesDto.getCard())).thenReturn(accountMono);
-
         when(accountService.findById(bankSharesDto.getCard())).thenReturn(accountMono);
-
-        when(accountRepository.save(any())).thenReturn(accountMono);
 
         when(accountService.update(any())).thenReturn(accountMono);
 
@@ -117,11 +106,7 @@ public class BankSharesServicesTest {
 
         Mono<Account> accountMono = Mono.just(accountBase);
 
-        when(accountRepository.findById(bankSharesDto.getCard())).thenReturn(accountMono);
-
         when(accountService.findById(bankSharesDto.getCard())).thenReturn(accountMono);
-
-        when(accountRepository.save(any())).thenReturn(accountMono);
 
         when(accountService.update(any())).thenReturn(accountMono);
 
@@ -147,11 +132,7 @@ public class BankSharesServicesTest {
 
         Mono<Account> accountSubmitMono = Mono.just(accountBaseSubmit);
 
-        when(accountRepository.findById(bankSharesDto.getCard())).thenReturn(accountSubmitMono);
-
         when(accountService.findById(bankSharesDto.getCard())).thenReturn(accountSubmitMono);
-
-        when(accountRepository.save(accountBaseSubmit)).thenReturn(accountSubmitMono);
 
         when(accountService.update(accountBaseSubmit)).thenReturn(accountSubmitMono);
 
@@ -178,14 +159,9 @@ public class BankSharesServicesTest {
 
         Mono<Account> accountReceiveMono = Mono.just(accountBaseReceive);
 
-        when(accountRepository.findById(bankSharesDto.getAccountTransfer())).thenReturn(accountReceiveMono);
-
         when(accountService.findById(bankSharesDto.getAccountTransfer())).thenReturn(accountReceiveMono);
 
-        when(accountRepository.save(accountBaseReceive)).thenReturn(accountReceiveMono);
-
         when(accountService.update(accountBaseReceive)).thenReturn(accountReceiveMono);
-
 
         bankSharesServices.transferAccountReceive(bankSharesDto.getAccountTransfer(), bankSharesDto.getAmount()).subscribe(account1 -> account = account1);
 

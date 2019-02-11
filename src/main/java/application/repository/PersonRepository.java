@@ -1,6 +1,5 @@
 package application.repository;
 
-import application.domain.Account;
 import application.domain.Person;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;

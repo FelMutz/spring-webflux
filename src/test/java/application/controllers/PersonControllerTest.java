@@ -66,6 +66,8 @@ public class PersonControllerTest {
     @Test
     public void findAll() {
 
+        person.setAccounts(new ArrayList<>());
+
         Flux<Person> persons = Flux.fromIterable(new ArrayList<>(){{
             add(person);
             add(person);

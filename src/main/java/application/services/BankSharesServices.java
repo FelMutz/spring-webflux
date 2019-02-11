@@ -3,7 +3,6 @@ package application.services;
 import application.domain.Account;
 import application.dto.BankSharesDto;
 import application.exceptions.ExceptionCustom;
-import application.repository.AccountRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
