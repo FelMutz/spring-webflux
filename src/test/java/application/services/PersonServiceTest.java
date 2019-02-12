@@ -4,6 +4,7 @@ import application.domain.Account;
 import application.domain.Person;
 import application.domain.enums.PersonType;
 import application.dto.BindAccountDto;
+import application.exceptions.ExceptionCustom;
 import application.repository.PersonRepository;
 import org.junit.Before;
 import org.junit.Rule;
@@ -13,14 +14,18 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
+import static org.hamcrest.Matchers.*;
 
 public class PersonServiceTest {
 
@@ -77,16 +82,21 @@ public class PersonServiceTest {
 
     }
 
-//    @Test
-//    public void findByIdPersonNotFound() {
-//
-//        thrown.expect(ExceptionCustom.class);
-//        thrown.expectMessage("Dado não existe no banco!");
-//
-//        when(personRepository.findById(anyString())).thenReturn(Mono.just(person).then(Mono.empty()));
-//        personService.findById("123").subscribe();
-//
-//    }
+    @Test
+    public void findByIdPersonNotFound() {
+
+        when(personRepository.findById("123")).thenReturn(Mono.empty());
+
+      try{
+          personService.findById("123").subscribe();
+      } catch (RuntimeException e) {
+          assertThat( e.getCause(),
+                  is(instanceOf(ExceptionCustom.class)));
+          assertThat( e.getMessage(),
+                  containsString("Dado não existe no banco!"));
+      }
+
+    }
 
     @Test
     public void insert() {
