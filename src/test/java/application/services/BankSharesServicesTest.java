@@ -3,6 +3,7 @@ package application.services;
 import application.domain.Account;
 import application.domain.enums.AccountType;
 import application.dto.BankSharesDto;
+import application.exceptions.ExceptionCustom;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -11,9 +12,13 @@ import org.junit.rules.ExpectedException;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.http.HttpStatus;
 import reactor.core.publisher.Mono;
 
+import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -34,7 +39,6 @@ public class BankSharesServicesTest {
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
-    public ErrorCollector errorCollector = new ErrorCollector();
 
     @Before
     public void setUp() throws Exception{
@@ -63,6 +67,41 @@ public class BankSharesServicesTest {
         bankSharesServices.withdrawal(bankSharesDto).subscribe(account1 -> account = account1);
 
         assertEquals(account.getBalance(), Double.valueOf(900));
+
+    }
+
+    @Test
+    public void withdrawalPasswordIncorrect() {
+
+
+        bankSharesDto.setCard("123");
+        bankSharesDto.setAmount(100D);
+        bankSharesDto.setPassword("456");
+
+        Account accountBase = Account.builder()
+                .accountType(AccountType.NORMAL)
+                .balance(1000D)
+                .password("123")
+                .card("123")
+                .build();
+
+        Mono<Account> accountMono = Mono.just(accountBase);
+
+        when(accountService.findById(bankSharesDto.getCard())).thenReturn(accountMono);
+
+        when(accountService.update(any())).thenReturn(accountMono);
+
+        bankSharesServices.withdrawal(bankSharesDto).subscribe(foo -> {
+            assertThat( foo,
+                    is(instanceOf(ExceptionCustom.class)));
+        }, error -> {
+            assertThat( error,
+                    is(instanceOf(ExceptionCustom.class)));
+            assertThat( error.getMessage(),
+                    containsString("Dado não confere com o banco!!"));
+        });
+
+
 
     }
 
