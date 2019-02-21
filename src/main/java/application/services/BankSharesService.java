@@ -11,7 +11,7 @@ import reactor.util.function.Tuple2;
 
 @Service
 @AllArgsConstructor
-public class BankSharesServices {
+public class BankSharesService {
 
     private AccountService accountService;
 

@@ -33,9 +33,6 @@ public class AccountServiceTest {
     @InjectMocks
     Account account;
 
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
-
     @Before
     public void setUp() throws Exception{
         MockitoAnnotations.initMocks(this);

@@ -3,7 +3,7 @@ package application.facade;
 import application.dto.AccountDto;
 import application.dto.BankSharesDto;
 import application.mappers.AccountMap;
-import application.services.BankSharesServices;
+import application.services.BankSharesService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
@@ -13,18 +13,18 @@ import reactor.util.function.Tuple2;
 @Component
 public class BankSharesServicesFacade {
 
-    BankSharesServices bankSharesServices;
+    BankSharesService bankSharesService;
 
     public Mono<AccountDto> withdrawal(BankSharesDto bankSharesDto){
 
-        return bankSharesServices.withdrawal(bankSharesDto).map(AccountMap::mapToDto);
+        return bankSharesService.withdrawal(bankSharesDto).map(AccountMap::mapToDto);
     }
 
     public Mono<AccountDto> deposit(BankSharesDto bankSharesDto){
-        return bankSharesServices.deposit(bankSharesDto).map(AccountMap::mapToDto);
+        return bankSharesService.deposit(bankSharesDto).map(AccountMap::mapToDto);
     }
 
     public Mono<AccountDto> transfer(BankSharesDto bankSharesDto){
-        return bankSharesServices.transfer(bankSharesDto).map(Tuple2::getT1).map(AccountMap::mapToDto);
+        return bankSharesService.transfer(bankSharesDto).map(Tuple2::getT1).map(AccountMap::mapToDto);
     }
 }

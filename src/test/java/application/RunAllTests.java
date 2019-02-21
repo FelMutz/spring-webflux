@@ -12,7 +12,7 @@ import org.junit.runners.Suite;
         ValidPasswordTest.class,
         PersonServiceTest.class,
         AccountServiceTest.class,
-        BankSharesServicesTest.class,
+        BankSharesServiceTest.class,
         RoudTest.class,
         BankSharesControllerTest.class,
         AccountControllerTest.class,

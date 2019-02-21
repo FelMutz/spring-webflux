@@ -5,14 +5,10 @@ import application.domain.enums.AccountType;
 import application.dto.BankSharesDto;
 import application.exceptions.ExceptionCustom;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ErrorCollector;
-import org.junit.rules.ExpectedException;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.http.HttpStatus;
 import reactor.core.publisher.Mono;
 
 import static org.hamcrest.Matchers.*;
@@ -22,14 +18,14 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-public class BankSharesServicesTest {
+public class BankSharesServiceTest {
 
 
     @Mock
     AccountService accountService;
 
     @InjectMocks
-    BankSharesServices bankSharesServices;
+    BankSharesService bankSharesService;
 
     @InjectMocks
     BankSharesDto bankSharesDto;
@@ -37,8 +33,6 @@ public class BankSharesServicesTest {
     @InjectMocks
     Account account;
 
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
 
     @Before
     public void setUp() throws Exception{
@@ -64,7 +58,7 @@ public class BankSharesServicesTest {
 
         when(accountService.update(any())).thenReturn(accountMono);
 
-        bankSharesServices.withdrawal(bankSharesDto).subscribe(account1 -> account = account1);
+        bankSharesService.withdrawal(bankSharesDto).subscribe(account1 -> account = account1);
 
         assertEquals(account.getBalance(), Double.valueOf(900));
 
@@ -91,7 +85,7 @@ public class BankSharesServicesTest {
 
         when(accountService.update(any())).thenReturn(accountMono);
 
-        bankSharesServices.withdrawal(bankSharesDto).subscribe(foo -> {
+        bankSharesService.withdrawal(bankSharesDto).subscribe(foo -> {
             assertThat( foo,
                     is(instanceOf(ExceptionCustom.class)));
         }, error -> {
@@ -124,7 +118,7 @@ public class BankSharesServicesTest {
 
         when(accountService.update(any())).thenReturn(accountMono);
 
-        bankSharesServices.withdrawal(bankSharesDto).subscribe(account1 -> account = account1);
+        bankSharesService.withdrawal(bankSharesDto).subscribe(account1 -> account = account1);
 
         assertEquals(account.getBalance(), Double.valueOf(895));
 
@@ -149,7 +143,7 @@ public class BankSharesServicesTest {
 
         when(accountService.update(any())).thenReturn(accountMono);
 
-        bankSharesServices.deposit(bankSharesDto).subscribe(account1 -> account = account1);
+        bankSharesService.deposit(bankSharesDto).subscribe(account1 -> account = account1);
 
         assertEquals(account.getBalance(), Double.valueOf(1100));
 
@@ -175,7 +169,7 @@ public class BankSharesServicesTest {
 
         when(accountService.update(accountBaseSubmit)).thenReturn(accountSubmitMono);
 
-        bankSharesServices.transferAccountSubmit(bankSharesDto.getCard(), bankSharesDto.getAmount(), bankSharesDto.getPassword())
+        bankSharesService.transferAccountSubmit(bankSharesDto.getCard(), bankSharesDto.getAmount(), bankSharesDto.getPassword())
                 .subscribe(account1 -> account = account1);
 
         assertEquals(Double.valueOf(894), account.getBalance());
@@ -202,7 +196,7 @@ public class BankSharesServicesTest {
 
         when(accountService.update(accountBaseReceive)).thenReturn(accountReceiveMono);
 
-        bankSharesServices.transferAccountReceive(bankSharesDto.getAccountTransfer(), bankSharesDto.getAmount()).subscribe(account1 -> account = account1);
+        bankSharesService.transferAccountReceive(bankSharesDto.getAccountTransfer(), bankSharesDto.getAmount()).subscribe(account1 -> account = account1);
 
         assertEquals(Double.valueOf(1100), account.getBalance());
     }
